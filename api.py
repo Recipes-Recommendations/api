@@ -8,6 +8,7 @@ from redis.commands.search.query import Query
 from sentence_transformers import SentenceTransformer
 from typing import Optional, List
 import boto3
+import json
 import logging
 import numpy as np
 import os
@@ -62,7 +63,7 @@ def get_secret(secret_name):
 try:
     REDIS_CREDS = get_secret("redis_data")
 except Exception as exc:
-    logger.error(exc)
+    LOGGER.error(exc)
     REDIS_CREDS = {
         "REDIS_HOST": os.getenv("REDIS_HOST"),
         "REDIS_PORT": os.getenv("REDIS_PORT"),
