@@ -61,7 +61,8 @@ def get_secret(secret_name):
 # Initialize Redis client
 try:
     REDIS_CREDS = get_secret("redis_data")
-except Exception:
+except Exception as exc:
+    logger.error(exc)
     REDIS_CREDS = {
         "REDIS_HOST": os.getenv("REDIS_HOST"),
         "REDIS_PORT": os.getenv("REDIS_PORT"),
@@ -70,11 +71,11 @@ except Exception:
     }
 print(REDIS_CREDS)
 REDIS_CLIENT = redis.Redis(
-    host=os.REDIS_CREDS['REDIS_HOST'],
+    host=REDIS_CREDS['REDIS_HOST'],
     port=int(REDIS_CREDS['REDIS_PORT']),
     decode_responses=True,
-    username=os.REDIS_CREDS['REDIS_USERNAME'],
-    password=os.REDIS_CREDS['REDIS_PASSWORD'],
+    username=REDIS_CREDS['REDIS_USERNAME'],
+    password=REDIS_CREDS['REDIS_PASSWORD'],
 )
 LOGGER.info("Redis client initialized")
 
@@ -288,4 +289,4 @@ async def get_recipes(query: str, page: int) -> dict:
 
 
 if __name__ == "__main__":
-    uvicorn.run("api:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("api:app", host="0.0.0.0", port=8080, reload=True)
