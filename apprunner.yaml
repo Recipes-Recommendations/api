@@ -13,4 +13,4 @@ run:
     port: 8080
   secrets:
     - name: redis_data
-      value-from: "arn:aws:secretsmanager:us-east-1:129204424156:secret:redis_data-mUNg4p
+      value-from: "arn:aws:secretsmanager:us-east-1:129204424156:secret:redis_data-mUNg4p"
