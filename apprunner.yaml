@@ -11,3 +11,6 @@ run:
   command: uvicorn api:app --host 0.0.0.0 --port 8080
   network:
     port: 8080
+  secrets:
+    - name: redis_data
+      value-from: "arn:aws:secretsmanager:us-east-1:129204424156:secret:redis_data-mUNg4p
