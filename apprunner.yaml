@@ -1,5 +1,0 @@
-run:
-  runtime-version: 3.11
-  pre-run:  
-    - pip3 -r requirements.txt sentence-transformers==4.1.0 peft==0.15.2
-  command: uvicorn api:app --host 0.0.0.0 --port 8080
