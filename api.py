@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from redis.commands.search.query import Query
 from sentence_transformers import SentenceTransformer
 from typing import Optional, List
+import boto3
 import logging
 import numpy as np
 import os
@@ -36,13 +37,44 @@ EMBEDDINGS_MODEL = PeftModel.from_pretrained(
 EMBEDDINGS_MODEL.eval()
 LOGGER.info("Embeddings model initialized")
 
+
+def get_secret(secret_name):
+    region_name = "us-east-1"
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name
+    )
+
+    try:
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+    except Exception as e:
+        raise e
+    else:
+        if 'SecretString' in get_secret_value_response:
+            return json.loads(get_secret_value_response['SecretString'])
+        else:
+            raise ValueError("Secret value is not a string")
+
 # Initialize Redis client
+try:
+    REDIS_CREDS = get_secret("redis_data")
+except Exception:
+    REDIS_CREDS = {
+        "REDIS_HOST": os.getenv("REDIS_HOST"),
+        "REDIS_PORT": os.getenv("REDIS_PORT"),
+        "REDIS_USERNAME": os.getenv("REDIS_USERNAME"),
+        "REDIS_PASSWORD": os.getenv("REDIS_PASSWORD")
+    }
+print(REDIS_CREDS)
 REDIS_CLIENT = redis.Redis(
-    host=os.getenv('REDIS_HOST'),
-    port=int(os.getenv('REDIS_PORT')),
+    host=os.REDIS_CREDS['REDIS_HOST'],
+    port=int(REDIS_CREDS['REDIS_PORT']),
     decode_responses=True,
-    username=os.getenv('REDIS_USERNAME'),
-    password=os.getenv('REDIS_PASSWORD'),
+    username=os.REDIS_CREDS['REDIS_USERNAME'],
+    password=os.REDIS_CREDS['REDIS_PASSWORD'],
 )
 LOGGER.info("Redis client initialized")
 
